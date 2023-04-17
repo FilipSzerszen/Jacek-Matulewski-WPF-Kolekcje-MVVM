@@ -64,5 +64,46 @@ namespace Kolekcje_MVVM.ModelWidoku
                 return new RelayCommand(argument => { Model.PlikXML.Zapisz(model , ścieżkaPliku); });
             }
         }
+
+        private ICommand usuńZadanie;
+        public ICommand UsuńZadanie
+        {
+            get
+            {
+                if (usuńZadanie == null) usuńZadanie = new RelayCommand(
+                       o =>
+                       {
+                           int indeksZadanie = (int)o;
+                           Zadanie zadanie = ListaZadań[indeksZadanie];
+                           ListaZadań.Remove(zadanie);
+                       },
+                        o =>
+                       {
+                           if (o == null) return false;
+                           int indeksZadanie = (int)o;
+                           return indeksZadanie >= 0;
+                       });
+                return usuńZadanie;
+            }
+        }
+
+        private ICommand dodajZadanie;
+        public ICommand DodajZadanie
+        {
+            get
+            {
+                if (dodajZadanie == null) dodajZadanie = new RelayCommand(
+                        o =>
+                       {
+                           Zadanie zadanie =o as Zadanie;
+                           if (zadanie != null) ListaZadań.Add(zadanie);
+                       },
+                        o =>
+                       {
+                           return o as Zadanie !=null;
+                       });
+                return dodajZadanie;
+            }
+        }
     }
 }

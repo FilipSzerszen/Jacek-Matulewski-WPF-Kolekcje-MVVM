@@ -24,4 +24,26 @@ namespace Kolekcje_MVVM
             throw new NotImplementedException();
         }
     }
+    public class ZadanieConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            string opis = (string)values[0];
+            DateTime dataUtworzenia = DateTime.Now;
+            DateTime? planowanyTerminRealizacji = (DateTime?)values[1];
+            Model.PriorytetZadania priorytet = (Model.PriorytetZadania)(int)values[2];
+
+            if (!string.IsNullOrWhiteSpace(opis) && planowanyTerminRealizacji.HasValue)
+            {
+                return new ModelWidoku.Zadanie(opis, dataUtworzenia, planowanyTerminRealizacji.Value, priorytet, false);
+            }
+            else return null;
+
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

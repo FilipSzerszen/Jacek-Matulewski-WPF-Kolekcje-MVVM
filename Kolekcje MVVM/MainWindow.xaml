@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Kolekcje_MVVM"
         xmlns:mw="clr-namespace:Kolekcje_MVVM.ModelWidoku"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        
+        xmlns:s="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Zadania" Height="500" Width="500">
     <Window.DataContext>
@@ -20,10 +20,21 @@
             <Setter Property="Height" Value="20"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="FontSize" Value="12"/>
         </Style>
         <BooleanToVisibilityConverter x:Key="boolToVisibility"/>
         <local:BoolToBrushKonwerter x:Key="czyZrealizowaneToBrush"/>
         <local:BoolToBrushKonwerter x:Key="czyPoTerminieToBrush" KolorDlaFałszu="Green" KolorDlaPrawdy="Red"/>
+        <local:ZadanieConverter x:Key="twórzZadanie"/>
+        <Style TargetType="{x:Type DatePickerTextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <TextBox Text="{Binding Path=SelectedDate, StringFormat={}{0:dd MMMM yyyy}, ConverterCulture=pl-PL, RelativeSource={RelativeSource AncestorType={x:Type DatePicker}}}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
@@ -71,5 +82,34 @@
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
+        <Button Content="Usuń zadanie" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,165" 
+                Width="100" Height="25" Style="{StaticResource stylPrzycisku}" Command="{Binding UsuńZadanie}" 
+                CommandParameter="{Binding ElementName=lbListaZadań, Path=SelectedIndex}"/>
+        <GroupBox Header="Nowe zadanie" Margin="10,0,10,10" MinWidth="420" Height="140" VerticalAlignment="Bottom">
+            <Grid>
+                <Label Content="Opis:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <TextBox x:Name="tbOpis" Height="23" Margin="10,30,10,0" VerticalAlignment="Top"/>
+                <Label Content="Priorytet:" Margin="10,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <ComboBox x:Name="cbPriorytet" Margin="10,85,0,0" Width="120" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <ComboBoxItem>Mniej ważne</ComboBoxItem>
+                    <ComboBoxItem IsSelected="true">Ważne</ComboBoxItem>
+                    <ComboBoxItem>Krytyczne</ComboBoxItem>
+                </ComboBox>
+                <Label Content="Termin realizacji" Margin="160,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                <DatePicker x:Name="dpTerminRealizacji"  Margin="160,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                            SelectedDate="{x:Static s:DateTime.Now}"/>
+                <Button Content="Dodaj zadanie" Margin="0,83,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                        Width="100" Height="25" Style="{StaticResource stylPrzycisku}" Command="{Binding DodajZadanie}">
+                    <Button.CommandParameter>
+                        <MultiBinding Converter="{StaticResource twórzZadanie}">
+                            <Binding ElementName="tbOpis" Path="Text"/>
+                            <Binding ElementName="dpTerminRealizacji" Path="SelectedDate"/>
+                            <Binding ElementName="cbPriorytet" Path="SelectedIndex"/>
+                        </MultiBinding>
+                    </Button.CommandParameter>
+                </Button>
+
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
