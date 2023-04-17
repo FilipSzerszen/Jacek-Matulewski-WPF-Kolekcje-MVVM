@@ -7,6 +7,7 @@
         xmlns:mw="clr-namespace:Kolekcje_MVVM.ModelWidoku"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:s="clr-namespace:System;assembly=mscorlib"
+        xmlns:jm="clr-namespace:JacekMatulewski.WpfUtils;assembly=JacekMatulewski.WpfUtils"
         mc:Ignorable="d"
         Title="Zadania" Height="500" Width="500">
     <Window.DataContext>
@@ -82,9 +83,26 @@
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>
+
+        <jm:NotificationDialogBox x:Name="notyficationDialogBox1" Caption="Zadania" 
+                                        CommandBefore="{Binding UsuńZadanie}" 
+                                        CommandParameter="{Binding ElementName=lbListaZadań, Path=SelectedIndex}"/>
+        
+        <jm:ConditionalMessageDialogBox x:Name="questionYesNo" Caption="Zadania" Icon="Question" Buttons="YesNo"
+                                        CommandYes="{Binding ElementName=notyficationDialogBox1, Path=Show}" 
+                                        CommandParameter="Zadanie zostało usunięte"
+                                        IsDialogBypassed="{Binding ElementName=lbListaZadań, Path=SelectedValue.CzyZrealizowane}"
+                                        DialogBypassButton="Yes"/>
+
         <Button Content="Usuń zadanie" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,165" 
-                Width="100" Height="25" Style="{StaticResource stylPrzycisku}" Command="{Binding UsuńZadanie}" 
-                CommandParameter="{Binding ElementName=lbListaZadań, Path=SelectedIndex}"/>
+                Width="100" Height="25" Style="{StaticResource stylPrzycisku}" Command="{Binding ElementName=questionYesNo, Path=Show}"
+                CommandParameter="Czy jesteś pewien, że chcesz usunąć niezrealizowane zadanie?"/>
+
+        <jm:SimpleMessageDialogBox x:Name="simpleMessageDialogBox" Caption="Zadania WPF"/>
+        <Button Content="O..." HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="395,0,10,165" Width="60" Height="25"
+                Style="{StaticResource stylPrzycisku}" Command="{Binding ElementName=simpleMessageDialogBox, Path=Show}" 
+                CommandParameter="Zadania WPF&#x0a; Filip Szerszeń 2023"/>
+        
         <GroupBox Header="Nowe zadanie" Margin="10,0,10,10" MinWidth="420" Height="140" VerticalAlignment="Bottom">
             <Grid>
                 <Label Content="Opis:" Margin="10,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
@@ -96,17 +114,24 @@
                     <ComboBoxItem>Krytyczne</ComboBoxItem>
                 </ComboBox>
                 <Label Content="Termin realizacji" Margin="160,60,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                <DatePicker x:Name="dpTerminRealizacji"  Margin="160,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
-                            SelectedDate="{x:Static s:DateTime.Now}"/>
-                <Button Content="Dodaj zadanie" Margin="0,83,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                        Width="100" Height="25" Style="{StaticResource stylPrzycisku}" Command="{Binding DodajZadanie}">
-                    <Button.CommandParameter>
+
+                <jm:NotificationDialogBox x:Name="notificationDialogBox" Caption="Zadania" CommandAfter="{Binding DodajZadanie}">
+                    <jm:NotificationDialogBox.CommandParameter>
                         <MultiBinding Converter="{StaticResource twórzZadanie}">
                             <Binding ElementName="tbOpis" Path="Text"/>
                             <Binding ElementName="dpTerminRealizacji" Path="SelectedDate"/>
                             <Binding ElementName="cbPriorytet" Path="SelectedIndex"/>
                         </MultiBinding>
-                    </Button.CommandParameter>
+                    </jm:NotificationDialogBox.CommandParameter>
+                </jm:NotificationDialogBox>
+
+                <DatePicker x:Name="dpTerminRealizacji"  Margin="160,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                            SelectedDate="{x:Static s:DateTime.Now}"/>
+                <Button Content="Dodaj zadanie" Margin="0,83,10,0" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                        Width="100" Height="25" Style="{StaticResource stylPrzycisku}" 
+                        Command="{Binding ElementName=notificationDialogBox, Path=Show}"
+                        CommandParameter="Zadanie zostało dodane">
+                    
                 </Button>
 
             </Grid>
